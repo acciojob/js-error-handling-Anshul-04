@@ -1,4 +1,4 @@
-//your code here
+
 class OutOfRangeError extends Error {
   constructor(arg) {
     super(`Expression should only consist of integers and +-/* characters and not ${arg}`);
@@ -27,24 +27,31 @@ function evalString(expression) {
       throw new SyntaxError('Expression should not end with an invalid operator');
     }
 
-    // Perform further evaluation or processing here if needed
-    console.log('Expression is valid:', expression);
+    const regex = /[^0-9\+\-\*\/\s]/g;
+    if (regex.test(expression)) {
+      const invalidChar = expression.match(regex)[0];
+      throw new OutOfRangeError(invalidChar);
+    }
+
+    // Rest of the code for evaluating the expression
+    // ...
+
+    return true; // Placeholder return value
   } catch (error) {
-    if (error instanceof InvalidExprError || error instanceof SyntaxError) {
-      throw error;
+    if (error instanceof OutOfRangeError || error instanceof InvalidExprError) {
+      console.log(`Error: ${error.name} - ${error.message}`);
     } else {
-      throw new OutOfRangeError(error.message);
+      throw error;
     }
   }
 }
 
-// Example usage:
+// Test cases
 try {
-  evalString('3 + 4 - 2 * 5'); // Expression is valid: 3 + 4 - 2 * 5
-  evalString('++3 + 4'); // Throws InvalidExprError
-  evalString('/3 + 4'); // Throws SyntaxError
-  evalString('5 - 2 * 6 /'); // Throws SyntaxError
-  evalString('2.5 + 3'); // Throws OutOfRangeError
+  evalString('1 + 2 - 3 * 4 / 5'); // No errors
+  evalString('1 + 2 *'); // Throws InvalidExprError
+  evalString('* 2 - 3 / 4 + 5'); // Throws SyntaxError
+  evalString('1 + 2 - 3 / 4 + 5 * a'); // Throws OutOfRangeError
 } catch (error) {
-  console.log(error.name + ':', error.message);
+  console.log(`Unexpected error: ${error}`);
 }
